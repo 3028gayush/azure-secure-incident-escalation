@@ -1,5 +1,7 @@
 using Incident.Api.Domain;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace Incident.Api.Controllers;
 
@@ -8,7 +10,8 @@ namespace Incident.Api.Controllers;
 public class IncidentsController : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get()
+    [Route("GetId")]
+    public IActionResult GetId(int? id = null)
     {
         var incidents = new[]
         {
@@ -23,5 +26,28 @@ public class IncidentsController : ControllerBase
         };
 
         return Ok(incidents);
+    }
+
+    [HttpGet]
+    [Authorize(Policy = "ReadOnly")]
+    public IActionResult Get()
+    {
+        return Ok("Read access granted");
+    }
+
+    // Update
+    [HttpPut]
+    [Authorize(Policy = "OperatorOrAdmin")]
+    public IActionResult Update()
+    {
+        return Ok("Update access granted");
+    }
+
+    // Escalate (Admin only)
+    [HttpPost("escalate")]
+    [Authorize(Policy = "AdminOnly")]
+    public IActionResult Escalate()
+    {
+        return Ok("Escalation successful");
     }
 }
