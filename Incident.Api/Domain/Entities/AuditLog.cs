@@ -10,7 +10,7 @@ public class AuditLog
 
     public DateTime PerformedAt { get; private set; }
 
-    public Guid IncidentId { get; private set; }
+    public Guid IncidentSlaId { get; private set; }
 
     private AuditLog() { }
 
@@ -19,7 +19,7 @@ public class AuditLog
         Id = Guid.NewGuid();
         Action = action;
         PerformedBy = performedBy;
-        IncidentId = incidentId;
+        IncidentSlaId = incidentId;
         PerformedAt = DateTime.UtcNow;
     }
 }
