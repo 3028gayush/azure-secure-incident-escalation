@@ -87,6 +87,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services
+    .AddApplicationServices()
+    .AddInfrastructureServices();
+
 var app = builder.Build();
 
 // -------------------- Middleware --------------------
