@@ -50,4 +50,12 @@ public class IncidentsController : ControllerBase
     {
         return Ok("Escalation successful");
     }
+
+[HttpGet("claims")]
+[Authorize]
+public IActionResult Claims()
+{
+    return Ok(User.Claims.Select(c => new { c.Type, c.Value }));
+}
+
 }

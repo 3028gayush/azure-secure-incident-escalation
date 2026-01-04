@@ -18,7 +18,8 @@ builder.Services
     .AddMicrosoftIdentityWebApi(options =>
     {
         builder.Configuration.Bind("AzureAd", options);
-        options.TokenValidationParameters.RoleClaimType = "roles";
+        options.TokenValidationParameters.RoleClaimType =
+    "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
     },
     options => builder.Configuration.Bind("AzureAd", options));
 
