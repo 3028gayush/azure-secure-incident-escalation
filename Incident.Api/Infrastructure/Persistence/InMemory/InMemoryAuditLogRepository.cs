@@ -14,6 +14,6 @@ public class InMemoryAuditLogRepository : IAuditLogRepository
 
     public IEnumerable<AuditLog> GetByIncidentId(Guid incidentId)
     {
-        return _logs.Where(l => l.IncidentId == incidentId);
+        return _logs.Where(l => l.IncidentSlaId == incidentId);
     }
 }

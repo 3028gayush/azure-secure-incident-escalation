@@ -17,13 +17,13 @@ public class IncidentService
         _auditService = auditService;
     }
 
-    public Incident Create(
+    public IncidentSla Create(
         string title,
         string description,
         IncidentPriority priority,
         string createdBy)
     {
-        var incident = new Incident(title, description, priority, createdBy);
+        var incident = new IncidentSla(title, description, priority, createdBy);
         _incidentRepository.Add(incident);
 
         _auditService.Log("INCIDENT_CREATED", createdBy, incident.Id);
@@ -53,7 +53,7 @@ public class IncidentService
         _auditService.Log("INCIDENT_ESCALATED", escalatedBy, id);
     }
 
-    public IEnumerable<Incident> GetAll()
+    public IEnumerable<IncidentSla> GetAll()
     {
         return _incidentRepository.GetAll();
     }

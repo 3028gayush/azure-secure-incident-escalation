@@ -1,61 +1,67 @@
-using Incident.Api.Domain;
-using Microsoft.AspNetCore.Mvc;
+using Incident.Api.Application.DTOs;
+using Incident.Api.Application.Services;
+using Incident.Api.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
-
+using Microsoft.AspNetCore.Mvc;
 
 namespace Incident.Api.Controllers;
 
 [ApiController]
 [Route("api/incidents")]
+[Authorize] // Authentication required for all endpoints
 public class IncidentsController : ControllerBase
 {
-    [HttpGet]
-    [Route("GetId")]
-    public IActionResult GetId(int? id = null)
-    {
-        var incidents = new[]
-        {
-            new IncidentSla
-            {
-                Id = Guid.NewGuid(),
-                Title = "Sample Incident",
-                Severity = "High",
-                CreatedAt = DateTime.UtcNow,
-                IsEscalated = false
-            }
-        };
+    private readonly IncidentService _incidentService;
 
+    public IncidentsController(IncidentService incidentService)
+    {
+        _incidentService = incidentService;
+    }
+
+    // 🔹 Create Incident (Any authenticated user)
+    [HttpPost]
+    [Route("SubmitData")]
+    public IActionResult Create([FromBody] AddIncidentRequestDto request)
+    {
+        var createdBy = User.Identity?.Name ?? "unknown";
+
+        var incident = _incidentService.Create(
+            request.Title,
+            request.Description,
+            request.Priority,
+            createdBy);
+
+        return CreatedAtAction(nameof(GetAll), incident);
+    }
+
+    // 🔹 View Incidents (Viewer, Operator, Admin)
+    [HttpGet]
+    [Authorize(Policy = "ReadOnly")]
+    public IActionResult GetAll()
+    {
+        var incidents = _incidentService.GetAll();
         return Ok(incidents);
     }
 
-    [HttpGet]
-    [Authorize(Policy = "ReadOnly")]
-    public IActionResult Get()
-    {
-        return Ok("Read access granted");
-    }
-
-    // Update
-    [HttpPut]
+    // 🔹 Update Incident (Operator, Admin)
+    [HttpPut("{id:guid}")]
     [Authorize(Policy = "OperatorOrAdmin")]
-    public IActionResult Update()
+    public IActionResult Update(Guid id, [FromBody] UpdateIncidentRequestDto request)
     {
-        return Ok("Update access granted");
+        var updatedBy = User.Identity?.Name ?? "unknown";
+
+        _incidentService.Update(id, request.Description, updatedBy);
+        return NoContent();
     }
 
-    // Escalate (Admin only)
-    [HttpPost("escalate")]
+    // 🔹 Escalate Incident (Admin only)
+    [HttpPost("{id:guid}/escalate")]
     [Authorize(Policy = "AdminOnly")]
-    public IActionResult Escalate()
+    public IActionResult Escalate(Guid id)
     {
-        return Ok("Escalation successful");
+        var escalatedBy = User.Identity?.Name ?? "unknown";
+
+        _incidentService.Escalate(id, escalatedBy);
+        return NoContent();
     }
-
-[HttpGet("claims")]
-[Authorize]
-public IActionResult Claims()
-{
-    return Ok(User.Claims.Select(c => new { c.Type, c.Value }));
-}
-
 }

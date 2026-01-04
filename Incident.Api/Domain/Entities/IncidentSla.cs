@@ -1,4 +1,7 @@
+using Incident.Api.Domain.Enums;
+
 namespace Incident.Api.Domain.Entities;
+
 
 public class IncidentSla
 {
