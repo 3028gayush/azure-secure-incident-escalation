@@ -90,7 +90,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services
     .AddApplicationServices()
-    .AddInfrastructureServices();
+    .AddInfrastructureServices(builder.Configuration);
 
 var app = builder.Build();
 
